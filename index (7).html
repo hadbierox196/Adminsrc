@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>SMC SRC Admin Panel - Images</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;600;700&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+      min-height: 100vh;
+      color: #333;
+    }
+    .admin-header {
+      background: linear-gradient(135deg, #7D00B6, #9D4EDD);
+      color: white;
+      padding: 2rem;
+      text-align: center;
+      box-shadow: 0 4px 20px rgba(125, 0, 182, 0.3);
+    }
+    .admin-header h1 {
+      font-family: 'Barlow', sans-serif;
+      font-size: 2.2rem;
+      margin-bottom: 0.25rem;
+    }
+    .admin-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem;
+      display: grid;
+      grid-template-columns: 1fr 1.5fr;
+      gap: 2rem;
+    }
+    .admin-section {
+      background: white;
+      border-radius: 15px;
+      padding: 1.5rem;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      transition: transform 0.3s ease;
+    }
+    .admin-section:hover { transform: translateY(-3px); }
+    .section-title {
+      font-family: 'Barlow', sans-serif;
+      font-size: 1.6rem;
+      color: #7D00B6;
+      margin-bottom: 1rem;
+      display: flex; align-items: center; gap: 0.5rem;
+    }
+    .form-group { margin-bottom: 1rem; }
+    .form-group label {
+      display: block; margin-bottom: 0.5rem; font-weight: 600; color: #555;
+    }
+    .form-group input[type="file"] {
+      width: 100%; padding: 10px; border: 2px solid #e1e5e9; border-radius: 8px; background: #fff;
+    }
+    .btn {
+      background: linear-gradient(45deg, #7D00B6, #9D4EDD);
+      color: white; border: none; padding: 10px 18px; border-radius: 8px;
+      cursor: pointer; font-size: 0.95rem; font-weight: 500; transition: all 0.3s ease;
+    }
+    .btn:hover { transform: translateY(-1px); box-shadow: 0 5px 15px rgba(125, 0, 182, 0.35); }
+    .btn.secondary {
+      background: #f3f4f6; color: #111827; border: 1px solid #e5e7eb;
+    }
+    .btn-danger { background: linear-gradient(45deg, #dc3545, #e74c3c); }
+    .btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+    .uploads {
+      margin-top: 1rem;
+    }
+    .upload-item {
+      border: 1px solid #eee; border-radius: 8px; padding: 10px; margin-bottom: 10px;
+    }
+    .upload-row { display: flex; justify-content: space-between; gap: 12px; align-items: center; }
+    .progress {
+      width: 100%; height: 8px; background: #eee; border-radius: 999px; overflow: hidden; margin-top: 8px;
+    }
+    .progress-bar { height: 100%; width: 0%; background: #7D00B6; transition: width 0.2s ease; }
+
+    .grid {
+      display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem;
+    }
+    @media (min-width: 768px) { .grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+    .image-card {
+      background: #fff; border: 1px solid #eee; border-radius: 12px; overflow: hidden;
+      display: flex; flex-direction: column;
+    }
+    .image-wrap { position: relative; width: 100%; aspect-ratio: 1 / 1; overflow: hidden; background: #f8f9fa; }
+    .image-wrap img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.2s ease; }
+    .image-card:hover img { transform: scale(1.03); }
+    .image-meta { padding: 10px 12px; display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+    .meta-left { min-width: 0; }
+    .name { font-size: 0.9rem; font-weight: 600; color: #111827; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .date { font-size: 0.75rem; color: #6b7280; }
+    .actions { display: flex; gap: 8px; }
+    .empty { color: #6b7280; font-size: 0.95rem; }
+
+    @media (max-width: 768px) {
+      .admin-container { grid-template-columns: 1fr; padding: 1rem; }
+      .admin-header { padding: 1.25rem; }
+      .admin-header h1 { font-size: 1.8rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="admin-header">
+    <h1><i class="fas fa-user-shield"></i> SMC SRC Admin Panel</h1>
+    <p>Upload and manage images</p>
+  </div>
+
+  <div class="admin-container">
+     Upload Section 
+    <section class="admin-section">
+      <h2 class="section-title"><i class="fas fa-image"></i> Upload Images</h2>
+
+      <div class="form-group">
+        <label for="fileInput">Choose images</label>
+        <input id="fileInput" type="file" accept="image/*" multiple />
+      </div>
+
+      <div style="display:flex; gap:10px; flex-wrap: wrap;">
+        <button id="uploadBtn" class="btn" disabled>
+          <i class="fas fa-cloud-arrow-up"></i> Upload
+        </button>
+        <button id="clearBtn" class="btn secondary">
+          <i class="fas fa-eraser"></i> Clear selection
+        </button>
+      </div>
+
+      <div id="uploads" class="uploads"></div>
+    </section>
+
+     Library Section 
+    <section class="admin-section">
+      <h2 class="section-title"><i class="fas fa-images"></i> Image Library</h2>
+      <div id="libraryState" class="empty">Loading images...</div>
+      <div id="imageGrid" class="grid" aria-live="polite"></div>
+    </section>
+  </div>
+
+   Firebase + App Logic 
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getDatabase, ref as dbRef, onValue, push, remove } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+    import { getStorage, ref as stRef, uploadBytesResumable, getDownloadURL, deleteObject } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
+
+    // Use your existing config (from your original HTML)
+    const firebaseConfig = {
+      apiKey: "AIzaSyDF2wmnHZWwLsJ3H20FMdnyNSVE7UNPGUE",
+      authDomain: "srcsms-fbe25.firebaseapp.com",
+      databaseURL: "https://srcsms-fbe25-default-rtdb.firebaseio.com",
+      projectId: "srcsms-fbe25",
+      storageBucket: "srcsms-fbe25.firebasestorage.app",
+      messagingSenderId: "1085257788571",
+      appId: "1:1085257788571:web:19f9d4f327868d1cdfaa3e",
+      measurementId: "G-HJD1DPLCXR",
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+    const storage = getStorage(app);
+
+    const fileInput = document.getElementById("fileInput");
+    const uploadBtn = document.getElementById("uploadBtn");
+    const clearBtn = document.getElementById("clearBtn");
+    const uploads = document.getElementById("uploads");
+    const imageGrid = document.getElementById("imageGrid");
+    const libraryState = document.getElementById("libraryState");
+
+    let pickedFiles = null;
+
+    fileInput.addEventListener("change", (e) => {
+      pickedFiles = e.target.files;
+      uploadBtn.disabled = !pickedFiles || pickedFiles.length === 0;
+      renderUploadQueue();
+    });
+
+    clearBtn.addEventListener("click", () => {
+      fileInput.value = "";
+      pickedFiles = null;
+      uploadBtn.disabled = true;
+      uploads.innerHTML = "";
+    });
+
+    uploadBtn.addEventListener("click", async () => {
+      if (!pickedFiles || pickedFiles.length === 0) return;
+      uploadBtn.disabled = true;
+
+      for (const file of Array.from(pickedFiles)) {
+        const row = ensureUploadItem(file.name);
+        await uploadSingleFile(file, row);
+      }
+
+      // Reset picker after uploads
+      fileInput.value = "";
+      pickedFiles = null;
+      uploadBtn.disabled = true;
+    });
+
+    function renderUploadQueue() {
+      uploads.innerHTML = "";
+      if (!pickedFiles || pickedFiles.length === 0) return;
+      for (const file of Array.from(pickedFiles)) {
+        ensureUploadItem(file.name);
+      }
+    }
+
+    function ensureUploadItem(name) {
+      let row = document.querySelector(\`[data-upload-item="\${CSS.escape(name)}"]\`);
+      if (row) return row;
+
+      row = document.createElement("div");
+      row.className = "upload-item";
+      row.dataset.uploadItem = name;
+
+      row.innerHTML = \`
+        <div class="upload-row">
+          <div style="min-width:0;">
+            <div style="font-weight:600; font-size:0.95rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">\${name}</div>
+          </div>
+          <div class="status" style="font-size:0.8rem; color:#6b7280;">Waiting</div>
+        </div>
+        <div class="progress" aria-hidden="true"><div class="progress-bar"></div></div>
+      \`;
+
+      uploads.appendChild(row);
+      return row;
+    }
+
+    async function uploadSingleFile(file, row) {
+      const statusEl = row.querySelector(".status");
+      const bar = row.querySelector(".progress-bar");
+
+      const safeName = file.name.replace(/\s+/g, "_");
+      const path = \`uploads/\${Date.now()}_\${safeName}\`;
+      const ref = stRef(storage, path);
+
+      const task = uploadBytesResumable(ref, file, { contentType: file.type });
+      statusEl.textContent = "Uploading...";
+
+      await new Promise((resolve) => {
+        task.on(
+          "state_changed",
+          (snap) => {
+            const pct = Math.round((snap.bytesTransferred / snap.totalBytes) * 100);
+            bar.style.width = pct + "%";
+            statusEl.textContent = \`Uploading \${pct}%\`;
+          },
+          (err) => {
+            statusEl.textContent = "Error: " + err.message;
+            statusEl.style.color = "#dc2626";
+            resolve();
+          },
+          async () => {
+            const url = await getDownloadURL(task.snapshot.ref);
+            const meta = {
+              name: file.name,
+              path,
+              url,
+              size: file.size,
+              type: file.type,
+              timestamp: Date.now(),
+              date: new Date().toLocaleDateString(),
+            };
+            await push(dbRef(db, "images"), meta);
+            statusEl.textContent = "Uploaded";
+            statusEl.style.color = "#16a34a";
+            bar.style.background = "#16a34a";
+            resolve();
+          }
+        );
+      });
+    }
+
+    // Load and render library
+    function loadImages() {
+      const imagesRef = dbRef(db, "images");
+      onValue(imagesRef, (snapshot) => {
+        const data = snapshot.val();
+        imageGrid.innerHTML = "";
+        if (!data) {
+          libraryState.textContent = "No images uploaded yet.";
+          return;
+        }
+        libraryState.textContent = "";
+
+        const list = Object.keys(data)
+          .map((id) => ({ id, ...data[id] }))
+          .sort((a, b) => b.timestamp - a.timestamp);
+
+        for (const item of list) {
+          imageGrid.appendChild(renderImageCard(item));
+        }
+      });
+    }
+
+    function renderImageCard(item) {
+      const card = document.createElement("div");
+      card.className = "image-card";
+
+      const wrap = document.createElement("div");
+      wrap.className = "image-wrap";
+      const img = document.createElement("img");
+      img.src = item.url || "/placeholder.svg?height=600&width=600";
+      img.alt = \`Uploaded \${item.name}\`;
+      wrap.appendChild(img);
+
+      const meta = document.createElement("div");
+      meta.className = "image-meta";
+
+      const left = document.createElement("div");
+      left.className = "meta-left";
+      const name = document.createElement("div");
+      name.className = "name";
+      name.textContent = item.name;
+      const date = document.createElement("div");
+      date.className = "date";
+      date.textContent = item.date || "N/A";
+      left.appendChild(name);
+      left.appendChild(date);
+
+      const actions = document.createElement("div");
+      actions.className = "actions";
+
+      const copyBtn = document.createElement("button");
+      copyBtn.className = "btn secondary";
+      copyBtn.innerHTML = '<i class="fas fa-link"></i> Copy URL';
+      copyBtn.addEventListener("click", async () => {
+        try {
+          await navigator.clipboard.writeText(item.url);
+          toast("Copied image URL to clipboard.");
+        } catch {
+          toast("Failed to copy URL.", true);
+        }
+      });
+
+      const delBtn = document.createElement("button");
+      delBtn.className = "btn btn-danger";
+      delBtn.innerHTML = '<i class="fas fa-trash"></i>';
+      delBtn.title = "Delete image";
+      delBtn.addEventListener("click", async () => {
+        const ok = confirm("Delete this image permanently?");
+        if (!ok) return;
+        try {
+          // Remove DB first for snappy UI
+          await remove(dbRef(db, "images/" + item.id));
+          // Then delete Storage object
+          const fileRef = stRef(storage, item.path);
+          await deleteObject(fileRef);
+          toast("Image deleted.");
+        } catch (e) {
+          toast("Delete failed. Check your Storage rules.", true);
+        }
+      });
+
+      actions.appendChild(copyBtn);
+      actions.appendChild(delBtn);
+
+      meta.appendChild(left);
+      meta.appendChild(actions);
+
+      card.appendChild(wrap);
+      card.appendChild(meta);
+
+      return card;
+    }
+
+    function toast(message, isError = false) {
+      const el = document.createElement("div");
+      el.textContent = message;
+      el.style.position = "fixed";
+      el.style.bottom = "20px";
+      el.style.right = "20px";
+      el.style.padding = "10px 14px";
+      el.style.borderRadius = "8px";
+      el.style.color = isError ? "#721c24" : "#155724";
+      el.style.background = isError ? "#f8d7da" : "#d4edda";
+      el.style.boxShadow = "0 5px 15px rgba(0,0,0,0.15)";
+      el.style.zIndex = "9999";
+      document.body.appendChild(el);
+      setTimeout(() => el.remove(), 2500);
+    }
+
+    // Init
+    loadImages();
+  </script>
+</body>
+</html>
