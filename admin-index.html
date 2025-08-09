@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SMC SRC Admin Panel</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;600;700&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .admin-header {
+            background: linear-gradient(135deg, #7D00B6, #9D4EDD);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+            box-shadow: 0 4px 20px rgba(125, 0, 182, 0.3);
+        }
+
+        .admin-header h1 {
+            font-family: 'Barlow', sans-serif;
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .admin-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+
+        .admin-section {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+        .admin-section:hover { transform: translateY(-5px); }
+
+        .section-title {
+            font-family: 'Barlow', sans-serif;
+            font-size: 1.8rem;
+            color: #7D00B6;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .form-group { margin-bottom: 1.5rem; }
+        .form-group label {
+            display: block; margin-bottom: 0.5rem; font-weight: 600; color: #555;
+        }
+        .form-group input, .form-group textarea {
+            width: 100%; padding: 12px 15px; border: 2px solid #e1e5e9; border-radius: 8px; font-size: 1rem; transition: all 0.3s ease;
+        }
+        .form-group input:focus, .form-group textarea:focus {
+            outline: none; border-color: #7D00B6; box-shadow: 0 0 0 3px rgba(125, 0, 182, 0.1);
+        }
+        .form-group textarea { height: 120px; resize: vertical; }
+
+        .btn {
+            background: linear-gradient(45deg, #7D00B6, #9D4EDD);
+            color: white; border: none; padding: 12px 25px; border-radius: 8px; cursor: pointer; font-size: 1rem; font-weight: 500;
+            transition: all 0.3s ease; margin-right: 10px; margin-bottom: 10px;
+        }
+        .btn:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(125, 0, 182, 0.4); }
+
+        .btn-danger { background: linear-gradient(45deg, #dc3545, #e74c3c); }
+        .btn-danger:hover { box-shadow: 0 5px 15px rgba(220, 53, 69, 0.4); }
+
+        .item-list { max-height: 400px; overflow-y: auto; margin-top: 2rem; }
+
+        .item-card {
+            background: #f8f9fa; border-radius: 10px; padding: 1.5rem; margin-bottom: 1rem; border-left: 4px solid #7D00B6; transition: all 0.3s ease;
+        }
+        .item-card:hover { background: #e9ecef; transform: translateX(5px); }
+
+        .item-title { font-weight: 600; color: #7D00B6; margin-bottom: 0.5rem; }
+        .item-content { color: #666; margin-bottom: 1rem; }
+
+        .item-actions { display: flex; gap: 0.5rem; }
+        .btn-small { padding: 8px 15px; font-size: 0.9rem; }
+
+        .login-section {
+            max-width: 400px; margin: 2rem auto; background: white; border-radius: 15px; padding: 2rem; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1); text-align: center;
+        }
+
+        .hidden { display: none; }
+
+        .auth-status {
+            background: #d4edda; color: #155724; padding: 1rem; border-radius: 8px; margin-bottom: 1rem; text-align: center;
+        }
+        .auth-status.error { background: #f8d7da; color: #721c24; }
+
+        .loading {
+            display: inline-block; width: 20px; height: 20px; border: 3px solid #f3f3f3; border-top: 3px solid #7D00B6; border-radius: 50%;
+            animation: spin 1s linear infinite; margin-left: 10px;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg) } 100% { transform: rotate(360deg) } }
+
+        .date-info { font-size: 0.9rem; color: #666; font-style: italic; }
+
+        /* Consistent 16:9 ratio for news images (preview and admin list) */
+        .image-preview, .news-thumb, .news-thumb img { width: 100%; }
+        .image-preview, .news-thumb {
+            aspect-ratio: 16 / 9; border-radius: 10px; overflow: hidden; background: #f3f4f6; border: 1px solid #e5e7eb; margin-top: .5rem;
+        }
+        .image-preview img, .news-thumb img {
+            width: 100%; height: 100%; object-fit: cover; display: block;
+        }
+
+        @media (max-width: 768px) {
+            .admin-container { grid-template-columns: 1fr; padding: 1rem; }
+            .admin-header { padding: 1rem; }
+            .admin-header h1 { font-size: 2rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-header">
+        <h1><i class="fas fa-user-shield"></i> SMC SRC Admin Panel</h1>
+        <p>Manage FAQs and News Content</p>
+    </div>
+
+    <div id="adminContent">
+        <div class="admin-container">
+             FAQ Management 
+            <div class="admin-section">
+                <h2 class="section-title"><i class="fas fa-question-circle"></i> FAQ Management</h2>
+                <form id="faqForm">
+                    <div class="form-group">
+                        <label for="faqQuestion">Question:</label>
+                        <input type="text" id="faqQuestion" placeholder="Enter FAQ question" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="faqAnswer">Answer:</label>
+                        <textarea id="faqAnswer" placeholder="Enter FAQ answer" required></textarea>
+                    </div>
+                    <button type="submit" class="btn"><i class="fas fa-plus"></i> Add FAQ</button>
+                    <button type="button" class="btn" onclick="clearFaqForm()"><i class="fas fa-times"></i> Clear</button>
+                </form>
+                <div class="item-list" id="faqList"></div>
+            </div>
+
+             News Management 
+            <div class="admin-section">
+                <h2 class="section-title"><i class="fas fa-newspaper"></i> News Management</h2>
+                <form id="newsForm">
+                    <div class="form-group">
+                        <label for="newsTitle">Title:</label>
+                        <input type="text" id="newsTitle" placeholder="Enter news title" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="newsContent">Content:</label>
+                        <textarea id="newsContent" placeholder="Enter news content" required></textarea>
+                    </div>
+                     New: Image upload + preview 
+                    <div class="form-group">
+                        <label for="newsImage">Image (optional):</label>
+                        <input type="file" id="newsImage" accept="image/*">
+                        <div id="newsImagePreview" class="image-preview hidden" aria-live="polite"></div>
+                        <small style="color:#666;display:block;margin-top:.35rem">Recommended: JPG/PNG/WebP, up to ~5MB.</small>
+                    </div>
+
+                    <button type="submit" class="btn"><i class="fas fa-plus"></i> Add News</button>
+                    <button type="button" class="btn" onclick="clearNewsForm()"><i class="fas fa-times"></i> Clear</button>
+                </form>
+                <div class="item-list" id="newsList"></div>
+            </div>
+        </div>
+    </div>
+
+     Firebase Configuration 
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getDatabase, ref, push, onValue, remove, update } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+        import { getStorage, ref as storageRef, uploadBytes, getDownloadURL, deleteObject } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDF2wmnHZWwLsJ3H20FMdnyNSVE7UNPGUE",
+            authDomain: "srcsms-fbe25.firebaseapp.com",
+            databaseURL: "https://srcsms-fbe25-default-rtdb.firebaseio.com",
+            projectId: "srcsms-fbe25",
+            storageBucket: "srcsms-fbe25.firebasestorage.app",
+            messagingSenderId: "1085257788571",
+            appId: "1:1085257788571:web:19f9d4f327868d1cdfaa3e",
+            measurementId: "G-HJD1DPLCXR"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const database = getDatabase(app);
+        const storage = getStorage(app);
+
+        // Make Firebase available globally (DB + Storage)
+        window.firebase = {
+            app,
+            database,
+            ref,
+            push,
+            onValue,
+            remove,
+            update,
+            storage,
+            storageRef,
+            uploadBytes,
+            getDownloadURL,
+            deleteObject,
+        };
+
+        // Load content on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            loadFAQs();
+            loadNews();
+        });
+    </script>
+
+    <script>
+        let editingFaqId = null;
+
+        // --- Optional auth helpers (not wired to UI) ---
+        async function adminLogin() {
+            const email = document.getElementById('adminEmail')?.value;
+            const password = document.getElementById('adminPassword')?.value;
+            if (!email || !password) {
+                showAuthStatus('Please enter both email and password', 'error');
+                return;
+            }
+            try {
+                // Add Firebase Auth imports and usage if you need auth.
+                showAuthStatus('Login successful!', 'success');
+            } catch (error) {
+                showAuthStatus('Login failed: ' + (error?.message || error), 'error');
+            }
+        }
+        async function adminLogout() { /* implement if using auth */ }
+        function showAuthStatus(message, type) {
+            const el = document.getElementById('authStatus');
+            if (!el) return;
+            el.textContent = message;
+            el.className = `auth-status ${type === 'error' ? 'error' : ''}`;
+            el.classList.remove('hidden');
+            setTimeout(() => { el.classList.add('hidden'); }, 3000);
+        }
+        function showLoginSection() {
+            document.getElementById('loginSection')?.classList.remove('hidden');
+            document.getElementById('adminContent')?.classList.add('hidden');
+        }
+        function showAdminContent() {
+            document.getElementById('loginSection')?.classList.add('hidden');
+            document.getElementById('adminContent')?.classList.remove('hidden');
+        }
+
+        // --- FAQ Management ---
+        document.getElementById('faqForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const question = document.getElementById('faqQuestion').value.trim();
+            const answer = document.getElementById('faqAnswer').value.trim();
+            if (!question || !answer) return;
+
+            const faqData = {
+                question,
+                answer,
+                timestamp: Date.now(),
+                date: new Date().toLocaleDateString()
+            };
+
+            if (editingFaqId) {
+                window.firebase.update(window.firebase.ref(window.firebase.database, 'faqs/' + editingFaqId), faqData);
+                editingFaqId = null;
+                document.querySelector('#faqForm button[type="submit"]').innerHTML = '<i class="fas fa-plus"></i> Add FAQ';
+            } else {
+                window.firebase.push(window.firebase.ref(window.firebase.database, 'faqs'), faqData);
+            }
+            clearFaqForm();
+        });
+
+        function clearFaqForm() {
+            document.getElementById('faqQuestion').value = '';
+            document.getElementById('faqAnswer').value = '';
+            editingFaqId = null;
+            document.querySelector('#faqForm button[type="submit"]').innerHTML = '<i class="fas fa-plus"></i> Add FAQ';
+        }
+
+        function loadFAQs() {
+            const faqsRef = window.firebase.ref(window.firebase.database, 'faqs');
+            window.firebase.onValue(faqsRef, (snapshot) => {
+                const faqList = document.getElementById('faqList');
+                faqList.innerHTML = '';
+                const faqs = snapshot.val();
+                if (faqs) {
+                    Object.keys(faqs).forEach(key => {
+                        const faq = faqs[key];
+                        const faqCard = createFaqCard(key, faq);
+                        faqList.appendChild(faqCard);
+                    });
+                }
+            });
+        }
+
+        function createFaqCard(id, faq) {
+            const div = document.createElement('div');
+            div.className = 'item-card';
+            div.innerHTML = `
+                <div class="item-title">${escapeHtml(faq.question)}</div>
+                <div class="item-content">${escapeHtml(faq.answer)}</div>
+                <div class="date-info">Added: ${faq.date || 'N/A'}</div>
+                <div class="item-actions">
+                    <button class="btn btn-small" onclick="editFaq('${id}', '${encodeURIComponent(faq.question || '')}', '${encodeURIComponent(faq.answer || '')}')">
+                        <i class="fas fa-edit"></i> Edit
+                    </button>
+                    <button class="btn btn-danger btn-small" onclick="deleteFaq('${id}')">
+                        <i class="fas fa-trash"></i> Delete
+                    </button>
+                </div>
+            `;
+            return div;
+        }
+
+        function editFaq(id, encQuestion, encAnswer) {
+            document.getElementById('faqQuestion').value = decodeURIComponent(encQuestion || '');
+            document.getElementById('faqAnswer').value = decodeURIComponent(encAnswer || '');
+            editingFaqId = id;
+            document.querySelector('#faqForm button[type="submit"]').innerHTML = '<i class="fas fa-save"></i> Update FAQ';
+        }
+
+        function deleteFaq(id) {
+            if (confirm('Are you sure you want to delete this FAQ?')) {
+                window.firebase.remove(window.firebase.ref(window.firebase.database, 'faqs/' + id));
+            }
+        }
+
+        // --- News Management with Image Upload ---
+        let editingNewsId = null;
+        let selectedNewsImageFile = null;
+        let editingNewsImageUrl = '';
+        let editingNewsImagePath = ''; // storage path to allow deletion/replacement
+
+        const newsImageInput = document.getElementById('newsImage');
+        const newsImagePreview = document.getElementById('newsImagePreview');
+
+        if (newsImageInput) {
+            newsImageInput.addEventListener('change', () => {
+                selectedNewsImageFile = newsImageInput.files?.[0] || null;
+                if (selectedNewsImageFile) {
+                    const url = URL.createObjectURL(selectedNewsImageFile);
+                    newsImagePreview.innerHTML = `<img src="${url}" alt="Selected news image preview">`;
+                    newsImagePreview.classList.remove('hidden');
+                } else {
+                    newsImagePreview.innerHTML = '';
+                    newsImagePreview.classList.add('hidden');
+                }
+            });
+        }
+
+        document.getElementById('newsForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const title = document.getElementById('newsTitle').value.trim();
+            const content = document.getElementById('newsContent').value.trim();
+            if (!title || !content) return;
+
+            const baseData = {
+                title,
+                content,
+                timestamp: Date.now(),
+                date: new Date().toLocaleDateString(),
+            };
+
+            try {
+                if (editingNewsId) {
+                    let imageUrl = editingNewsImageUrl || '';
+                    let imagePath = editingNewsImagePath || '';
+
+                    // If a new file is chosen, upload and optionally delete the old file
+                    if (selectedNewsImageFile) {
+                        // Delete old image if we have a stored path
+                        if (imagePath) {
+                            try {
+                                const oldRef = window.firebase.storageRef(window.firebase.storage, imagePath);
+                                await window.firebase.deleteObject(oldRef);
+                            } catch (_) { /* ignore if not found */ }
+                        }
+                        // Upload new image
+                        imagePath = `news/${editingNewsId}-${Date.now()}-${sanitizeFileName(selectedNewsImageFile.name)}`;
+                        const sRef = window.firebase.storageRef(window.firebase.storage, imagePath);
+                        await window.firebase.uploadBytes(sRef, selectedNewsImageFile);
+                        imageUrl = await window.firebase.getDownloadURL(sRef);
+                    }
+
+                    const newsData = { ...baseData, ...(imageUrl ? { imageUrl } : {}), ...(imagePath ? { imagePath } : {}) };
+                    await window.firebase.update(window.firebase.ref(window.firebase.database, 'news/' + editingNewsId), newsData);
+
+                    editingNewsId = null;
+                    editingNewsImageUrl = '';
+                    editingNewsImagePath = '';
+                    document.querySelector('#newsForm button[type="submit"]').innerHTML = '<i class="fas fa-plus"></i> Add News';
+                } else {
+                    // Create new entry
+                    const newRef = window.firebase.push(window.firebase.ref(window.firebase.database, 'news'));
+                    const newId = newRef.key;
+
+                    let imageUrl = '';
+                    let imagePath = '';
+                    if (selectedNewsImageFile && newId) {
+                        imagePath = `news/${newId}-${Date.now()}-${sanitizeFileName(selectedNewsImageFile.name)}`;
+                        const sRef = window.firebase.storageRef(window.firebase.storage, imagePath);
+                        await window.firebase.uploadBytes(sRef, selectedNewsImageFile);
+                        imageUrl = await window.firebase.getDownloadURL(sRef);
+                    }
+
+                    const newsData = { ...baseData, ...(imageUrl ? { imageUrl } : {}), ...(imagePath ? { imagePath } : {}) };
+                    await window.firebase.update(newRef, newsData);
+                }
+            } catch (err) {
+                console.error('Error adding/updating news:', err);
+                alert('Failed to save news. Please try again.');
+            }
+
+            clearNewsForm();
+        });
+
+        function clearNewsForm() {
+            document.getElementById('newsTitle').value = '';
+            document.getElementById('newsContent').value = '';
+
+            editingNewsId = null;
+            editingNewsImageUrl = '';
+            editingNewsImagePath = '';
+            selectedNewsImageFile = null;
+
+            if (newsImageInput) newsImageInput.value = '';
+            if (newsImagePreview) {
+                newsImagePreview.innerHTML = '';
+                newsImagePreview.classList.add('hidden');
+            }
+
+            document.querySelector('#newsForm button[type="submit"]').innerHTML = '<i class="fas fa-plus"></i> Add News';
+        }
+
+        function loadNews() {
+            const newsRef = window.firebase.ref(window.firebase.database, 'news');
+            window.firebase.onValue(newsRef, (snapshot) => {
+                const newsList = document.getElementById('newsList');
+                newsList.innerHTML = '';
+
+                const news = snapshot.val();
+                if (news) {
+                    const sortedNews = Object.keys(news)
+                        .map(key => ({ id: key, ...news[key] }))
+                        .sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+
+                    sortedNews.forEach(item => {
+                        const card = createNewsCard(item.id, item);
+                        newsList.appendChild(card);
+                    });
+                }
+            });
+        }
+
+        function createNewsCard(id, news) {
+            const div = document.createElement('div');
+            div.className = 'item-card';
+
+            const safeTitle = escapeHtml(news.title || '');
+            const safeContent = escapeHtml(news.content || '');
+
+            const encodedTitle = encodeURIComponent(news.title || '');
+            const encodedContent = encodeURIComponent(news.content || '');
+            const encodedImageUrl = encodeURIComponent(news.imageUrl || '');
+            const encodedImagePath = encodeURIComponent(news.imagePath || '');
+
+            const imgBlock = news.imageUrl
+                ? `<div class="news-thumb" style="margin-bottom:.75rem"><img src="${escapeHtml(news.imageUrl)}" alt="${safeTitle} thumbnail" loading="lazy" decoding="async"></div>`
+                : '';
+
+            div.innerHTML = `
+                ${imgBlock}
+                <div class="item-title">${safeTitle}</div>
+                <div class="item-content">${safeContent}</div>
+                <div class="date-info">Published: ${news.date || 'N/A'}</div>
+                <div class="item-actions">
+                    <button class="btn btn-small"
+                        onclick="editNews('${id}', '${encodedTitle}', '${encodedContent}', '${encodedImageUrl}', '${encodedImagePath}')">
+                        <i class="fas fa-edit"></i> Edit
+                    </button>
+                    <button class="btn btn-danger btn-small"
+                        onclick="deleteNews('${id}', '${encodedImagePath}')">
+                        <i class="fas fa-trash"></i> Delete
+                    </button>
+                </div>
+            `;
+            return div;
+        }
+
+        function editNews(id, encTitle, encContent, encImageUrl, encImagePath) {
+            const title = decodeURIComponent(encTitle || '');
+            const content = decodeURIComponent(encContent || '');
+            const imageUrl = decodeURIComponent(encImageUrl || '');
+            const imagePath = decodeURIComponent(encImagePath || '');
+
+            document.getElementById('newsTitle').value = title;
+            document.getElementById('newsContent').value = content;
+
+            editingNewsId = id;
+            editingNewsImageUrl = imageUrl || '';
+            editingNewsImagePath = imagePath || '';
+            selectedNewsImageFile = null;
+
+            if (imageUrl) {
+                newsImagePreview.innerHTML = `<img src="${escapeHtml(imageUrl)}" alt="Existing news image preview">`;
+                newsImagePreview.classList.remove('hidden');
+            } else {
+                newsImagePreview.innerHTML = '';
+                newsImagePreview.classList.add('hidden');
+            }
+
+            document.querySelector('#newsForm button[type="submit"]').innerHTML = '<i class="fas fa-save"></i> Update News';
+        }
+
+        async function deleteNews(id, encImagePath) {
+            if (!confirm('Are you sure you want to delete this news item?')) return;
+            try {
+                const imagePath = decodeURIComponent(encImagePath || '');
+                await window.firebase.remove(window.firebase.ref(window.firebase.database, 'news/' + id));
+
+                if (imagePath) {
+                    try {
+                        const sRef = window.firebase.storageRef(window.firebase.storage, imagePath);
+                        await window.firebase.deleteObject(sRef);
+                    } catch (_) { /* ignore delete errors */ }
+                }
+            } catch (err) {
+                console.error('Delete failed:', err);
+                alert('Failed to delete news. Please try again.');
+            }
+        }
+
+        // Utils
+        function sanitizeFileName(name = '') {
+            return String(name).replace(/[^\w.\-]/g, '_');
+        }
+        function escapeHtml(str = '') {
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+
+        // Expose handlers used in onclick attributes
+        window.editFaq = editFaq;
+        window.deleteFaq = deleteFaq;
+        window.editNews = editNews;
+        window.deleteNews = deleteNews;
+    </script>
+</body>
+</html>
