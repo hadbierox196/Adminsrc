@@ -238,31 +238,8 @@
         <p>Manage FAQs and News Content</p>
     </div>
 
-    <!-- Login Section -->
-    <div id="loginSection" class="login-section">
-        <h2>Admin Login</h2>
-        <div class="form-group">
-            <label for="adminEmail">Email:</label>
-            <input type="email" id="adminEmail" placeholder="Enter admin email">
-        </div>
-        <div class="form-group">
-            <label for="adminPassword">Password:</label>
-            <input type="password" id="adminPassword" placeholder="Enter password">
-        </div>
-        <button class="btn" onclick="adminLogin()">
-            <i class="fas fa-sign-in-alt"></i> Login
-        </button>
-        <div id="authStatus" class="auth-status hidden"></div>
-    </div>
-
     <!-- Admin Panel Content -->
-    <div id="adminContent" class="hidden">
-        <div class="auth-status">
-            <i class="fas fa-check-circle"></i> Successfully logged in as admin
-            <button class="btn btn-small" onclick="adminLogout()" style="float: right;">
-                <i class="fas fa-sign-out-alt"></i> Logout
-            </button>
-        </div>
+    <div id="adminContent">
 
         <div class="admin-container">
             <!-- FAQ Management -->
@@ -327,7 +304,6 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getDatabase, ref, push, onValue, remove, update } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
-        import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyDF2wmnHZWwLsJ3H20FMdnyNSVE7UNPGUE",
@@ -343,36 +319,22 @@
         // Initialize Firebase
         const app = initializeApp(firebaseConfig);
         const database = getDatabase(app);
-        const auth = getAuth(app);
 
         // Make Firebase available globally
         window.firebase = {
             database,
-            auth,
             ref,
             push,
             onValue,
             remove,
-            update,
-            signInWithEmailAndPassword,
-            signOut,
-            onAuthStateChanged
+            update
         };
 
-        // Check authentication state
-        onAuthStateChanged(auth, (user) => {
-            if (user) {
-                showAdminContent();
-                loadFAQs();
-                loadNews();
-            } else {
-                showLoginSection();
-            }
+        // Load content on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            loadFAQs();
+            loadNews();
         });
-
-        // Load FAQs and News on page load
-        loadFAQs();
-        loadNews();
     </script>
 
     <script>
