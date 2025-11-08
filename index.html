@@ -3,275 +3,347 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SMC SRC Admin Panel</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;600;700&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <title>Admin Dashboard</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
-            font-family: 'Poppins', sans-serif;
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-            min-height: 100vh; color: #333;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
         }
-        .admin-header {
-            background: linear-gradient(135deg, #7D00B6, #9D4EDD);
-            color: white; padding: 2rem; text-align: center;
-            box-shadow: 0 4px 20px rgba(125, 0, 182, 0.3);
-        }
-        .admin-header h1 { font-family: 'Barlow', sans-serif; font-size: 2.5rem; margin-bottom: 0.5rem; }
-        .admin-container {
-            max-width: 1400px; margin: 0 auto; padding: 2rem;
-            display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 2rem;
-        }
-        .admin-section {
-            background: white; border-radius: 15px; padding: 2rem;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1); transition: transform 0.3s ease;
-        }
-        .admin-section:hover { transform: translateY(-5px); }
-        .section-title {
-            font-family: 'Barlow', sans-serif; font-size: 1.8rem; color: #7D00B6;
-            margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem;
-        }
-        .form-group { margin-bottom: 1.25rem; }
-        .form-group label { display: block; margin-bottom: 0.5rem; font-weight: 600; color: #555; }
-        .form-group input, .form-group textarea {
-            width: 100%; padding: 12px 15px; border: 2px solid #e1e5e9; border-radius: 8px; font-size: 1rem; transition: all 0.3s ease;
-        }
-        .form-group input:focus, .form-group textarea:focus {
-            outline: none; border-color: #7D00B6; box-shadow: 0 0 0 3px rgba(125, 0, 182, 0.1);
-        }
-        .form-group textarea { height: 120px; resize: vertical; }
-        .hint { font-size: .85rem; color:#666; margin-top:.35rem; }
-        .btn {
-            background: linear-gradient(45deg, #7D00B6, #9D4EDD); color: white; border: none;
-            padding: 12px 25px; border-radius: 8px; cursor: pointer; font-size: 1rem; font-weight: 500;
-            transition: all 0.3s ease; margin-right: 10px; margin-bottom: 10px;
-        }
-        .btn:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(125, 0, 182, 0.4); }
-        .btn-danger { background: linear-gradient(45deg, #dc3545, #e74c3c); }
-        .btn-danger:hover { box-shadow: 0 5px 15px rgba(220, 53, 69, 0.4); }
-        .item-list { max-height: 400px; overflow-y: auto; margin-top: 1.25rem; }
-        .item-card {
-            background: #f8f9fa; border-radius: 10px; padding: 1.25rem; margin-bottom: 1rem;
-            border-left: 4px solid #7D00B6; transition: all 0.3s ease; display:grid; grid-template-columns: 72px 1fr; gap: 12px;
-        }
-        .item-card:hover { background: #e9ecef; transform: translateX(5px); }
-        .item-title { font-weight: 600; color: #7D00B6; margin-bottom: 0.35rem; }
-        .item-content { color: #666; margin-bottom: 0.6rem; white-space: pre-line; }
-        .item-actions { display: flex; gap: 0.5rem; }
-        .btn-small { padding: 8px 15px; font-size: 0.9rem; }
-        .login-section {
-            max-width: 400px; margin: 2rem auto; background: white; border-radius: 15px; padding: 2rem;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1); text-align: center;
-        }
-        .hidden { display: none; }
-        .auth-status {
-            background: #d4edda; color: #155724; padding: 1rem; border-radius: 8px; margin-bottom: 1rem; text-align: center;
-        }
-        .auth-status.error { background: #f8d7da; color: #721c24; }
-        .loading { display: inline-block; width: 20px; height: 20px; border: 3px solid #f3f3f3; border-top: 3px solid #7D00B6; border-radius: 50%; animation: spin 1s linear infinite; margin-left: 10px; }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        .date-info { font-size: 0.9rem; color: #666; font-style: italic; }
 
-        /* Updated stats grid for Mission & Goals section */
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 1rem;
-            margin-top: 1rem;
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
         }
-        .stat-input {
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
-        }
-        .stat-input label {
-            font-size: 0.9rem;
-            font-weight: 600;
-            color: #7D00B6;
-        }
-        .stat-input input {
-            padding: 8px 12px;
-            border: 2px solid #e1e5e9;
-            border-radius: 6px;
-            font-size: 1.2rem;
-            font-weight: 600;
+
+        h1 {
+            color: white;
             text-align: center;
+            margin-bottom: 30px;
+            font-size: 2.5rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
         }
 
-        /* Optional 1:1 preview for news image links */
-        .thumb {
-          width: 72px; height: 72px; border-radius: 10px; padding:3px;
-          background: linear-gradient(135deg, #7D00B6, #9D4EDD, #C77DFF);
-          display:flex; align-items:center; justify-content:center;
-        }
-        .thumb > div{
-          width:100%; height:100%; border-radius:8px; overflow:hidden; background:#fff; position:relative;
-        }
-        .thumb img{
-          width:100%; height:100%; object-fit:cover; display:block;
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
         }
 
-        /* Hero image preview styling */
-        .hero-thumb {
-          width: 72px; height: 40px; border-radius: 8px; padding:2px;
-          background: linear-gradient(135deg, #7D00B6, #9D4EDD);
-          display:flex; align-items:center; justify-content:center;
+        .tab-btn {
+            padding: 12px 24px;
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s;
         }
-        .hero-thumb > div{
-          width:100%; height:100%; border-radius:6px; overflow:hidden; background:#fff; position:relative;
+
+        .tab-btn:hover {
+            background: rgba(255,255,255,0.3);
         }
-        .hero-thumb img{
-          width:100%; height:100%; object-fit:cover; display:block;
+
+        .tab-btn.active {
+            background: white;
+            color: #667eea;
+            font-weight: bold;
+        }
+
+        .tab-content {
+            display: none;
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        input, textarea, select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border 0.3s;
+        }
+
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        button {
+            padding: 12px 24px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: background 0.3s;
+        }
+
+        button:hover {
+            background: #5568d3;
+        }
+
+        button.delete-btn {
+            background: #ef4444;
+            padding: 8px 16px;
+            font-size: 14px;
+        }
+
+        button.delete-btn:hover {
+            background: #dc2626;
+        }
+
+        button.edit-btn {
+            background: #10b981;
+            padding: 8px 16px;
+            font-size: 14px;
+            margin-right: 8px;
+        }
+
+        button.edit-btn:hover {
+            background: #059669;
+        }
+
+        .list-item {
+            background: #f9fafb;
+            padding: 16px;
+            margin-bottom: 12px;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+
+        .list-item h3 {
+            margin-bottom: 8px;
+            color: #667eea;
+        }
+
+        .list-item p {
+            color: #666;
+            margin: 4px 0;
+        }
+
+        .actions {
+            margin-top: 12px;
+        }
+
+        .user-list {
+            max-height: 600px;
+            overflow-y: auto;
+        }
+
+        .success-msg {
+            background: #d1fae5;
+            color: #065f46;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .error-msg {
+            background: #fee2e2;
+            color: #991b1b;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
         }
 
         @media (max-width: 768px) {
-            .admin-container { grid-template-columns: 1fr; padding: 1rem; }
-            .admin-header { padding: 1rem; }
-            .admin-header h1 { font-size: 2rem; }
-            .stats-grid { grid-template-columns: 1fr; }
+            .grid-2 {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .img-preview {
+            max-width: 200px;
+            margin-top: 10px;
+            border-radius: 8px;
         }
     </style>
 </head>
 <body>
-    <div class="admin-header">
-        <h1><i class="fas fa-user-shield"></i> SMC SRC Admin Panel</h1>
-        <p>Manage Website Content</p>
-    </div>
+    <div class="container">
+        <h1>🔧 Admin Dashboard</h1>
 
-    <!-- Admin Panel Content -->
-    <div id="adminContent">
-        <div class="admin-container">
-            <!-- Added Hero Images Management Section -->
-            <div class="admin-section">
-                <h2 class="section-title">
-                    <i class="fas fa-images"></i> Hero Images Management
-                </h2>
-                
-                <form id="heroForm">
-                    <div class="form-group">
-                        <label for="heroImageUrl">Image URL:</label>
-                        <input type="url" id="heroImageUrl" placeholder="https://example.com/hero-image.jpg" required>
-                        <div class="hint">Add images for the hero carousel. Images will display in 16:9 aspect ratio.</div>
-                    </div>
-                    <button type="submit" class="btn">
-                        <i class="fas fa-plus"></i> Add Hero Image
-                    </button>
-                    <button type="button" class="btn" onclick="clearHeroForm()">
-                        <i class="fas fa-times"></i> Clear
-                    </button>
-                </form>
+        <div class="tabs">
+            <button class="tab-btn active" onclick="window.showTab('users', event)">👥 Manage Users</button>
+            <button class="tab-btn" onclick="window.showTab('news', event)">📰 Manage News</button>
+            <button class="tab-btn" onclick="window.showTab('workshops', event)">🎓 Manage Workshops</button>
+        </div>
 
-                <div class="item-list" id="heroList">
-                    <!-- Hero images will be loaded here -->
-                </div>
+        <!-- Users Tab -->
+        <div id="users" class="tab-content active">
+            <h2>User Management</h2>
+            <div class="success-msg" id="user-success"></div>
+            <div class="error-msg" id="user-error"></div>
+            
+            <div class="user-list" id="userList">
+                <p style="text-align: center; color: #999;">Loading users...</p>
             </div>
 
-            <!-- Added Mission & Goals Statistics Management -->
-            <div class="admin-section">
-                <h2 class="section-title">
-                    <i class="fas fa-chart-bar"></i> Mission & Goals Statistics
-                </h2>
-                
-                <form id="statsForm">
-                    <div class="stats-grid">
-                        <div class="stat-input">
-                            <label for="directorsCount">Directors Panel:</label>
-                            <input type="number" id="directorsCount" placeholder="25" min="0">
-                        </div>
-                        <div class="stat-input">
-                            <label for="headsCount">Heads:</label>
-                            <input type="number" id="headsCount" placeholder="150" min="0">
-                        </div>
-                        <div class="stat-input">
-                            <label for="subheadsCount">Subheads:</label>
-                            <input type="number" id="subheadsCount" placeholder="300" min="0">
-                        </div>
-                        <div class="stat-input">
-                            <label for="membersCount">Members:</label>
-                            <input type="number" id="membersCount" placeholder="1200" min="0">
-                        </div>
-                    </div>
-                    <button type="submit" class="btn" style="margin-top: 1rem;">
-                        <i class="fas fa-save"></i> Update Statistics
-                    </button>
-                </form>
+            <!-- Edit User Modal (inline) -->
+            <div id="editUserForm" style="display: none; margin-top: 30px; padding: 20px; background: #f0f0f0; border-radius: 8px;">
+                <h3>Edit User Details</h3>
+                <input type="hidden" id="editUserId">
+                <div class="form-group">
+                    <label>Name</label>
+                    <input type="text" id="editUserName">
+                </div>
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" id="editUserEmail">
+                </div>
+                <div class="form-group">
+                    <label>Role</label>
+                    <input type="text" id="editUserRole">
+                </div>
+                <div class="form-group">
+                    <label>Batch</label>
+                    <input type="text" id="editUserBatch">
+                </div>
+                <div class="form-group">
+                    <label>SMC ID</label>
+                    <input type="text" id="editUserSmcId">
+                </div>
+                <button onclick="updateUser()">Update User</button>
+                <button onclick="cancelEditUser()" style="background: #6b7280; margin-left: 10px;">Cancel</button>
+            </div>
+        </div>
+
+        <!-- News Tab -->
+        <div id="news" class="tab-content">
+            <h2>News Management</h2>
+            <div class="success-msg" id="news-success"></div>
+            <div class="error-msg" id="news-error"></div>
+            
+            <div style="margin-bottom: 30px;">
+                <h3>Add New Article</h3>
+                <div class="form-group">
+                    <label>Title</label>
+                    <input type="text" id="newsTitle" placeholder="Enter news title">
+                </div>
+                <div class="form-group">
+                    <label>Date</label>
+                    <input type="date" id="newsDate">
+                </div>
+                <div class="form-group">
+                    <label>Description</label>
+                    <textarea id="newsDescription" placeholder="Enter news description"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Image URL</label>
+                    <input type="url" id="newsImage" placeholder="https://example.com/image.jpg" onchange="previewNewsImage()">
+                    <img id="newsImagePreview" class="img-preview" style="display: none;">
+                </div>
+                <button onclick="addNews()">Add News Article</button>
             </div>
 
-            <!-- FAQ Management -->
-            <div class="admin-section">
-                <h2 class="section-title">
-                    <i class="fas fa-question-circle"></i> FAQ Management
-                </h2>
-                
-                <form id="faqForm">
-                    <div class="form-group">
-                        <label for="faqQuestion">Question:</label>
-                        <input type="text" id="faqQuestion" placeholder="Enter FAQ question" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="faqAnswer">Answer:</label>
-                        <textarea id="faqAnswer" placeholder="Enter FAQ answer" required></textarea>
-                    </div>
-                    <button type="submit" class="btn">
-                        <i class="fas fa-plus"></i> Add FAQ
-                    </button>
-                    <button type="button" class="btn" onclick="clearFaqForm()">
-                        <i class="fas fa-times"></i> Clear
-                    </button>
-                </form>
+            <hr style="margin: 30px 0;">
 
-                <div class="item-list" id="faqList">
-                    <!-- FAQs will be loaded here -->
+            <h3>Existing News</h3>
+            <div id="newsList">
+                <p style="text-align: center; color: #999;">Loading news...</p>
+            </div>
+        </div>
+
+        <!-- Workshops Tab -->
+        <div id="workshops" class="tab-content">
+            <h2>Workshop Management</h2>
+            <div class="success-msg" id="workshop-success"></div>
+            <div class="error-msg" id="workshop-error"></div>
+            
+            <div style="margin-bottom: 30px;">
+                <h3>Add New Workshop</h3>
+                <div class="form-group">
+                    <label>Title</label>
+                    <input type="text" id="workshopTitle" placeholder="Enter workshop title">
                 </div>
+                <div class="form-group">
+                    <label>Led By</label>
+                    <input type="text" id="workshopLedBy" placeholder="Instructor name">
+                </div>
+                <div class="form-group">
+                    <label>Date</label>
+                    <input type="date" id="workshopDate">
+                </div>
+                <div class="form-group">
+                    <label>Description</label>
+                    <textarea id="workshopDescription" placeholder="Enter workshop description"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Apply Now Link</label>
+                    <input type="url" id="workshopLink" placeholder="https://example.com/apply">
+                </div>
+                <button onclick="addWorkshop()">Add Workshop</button>
             </div>
 
-            <!-- Updated News Management with redirect link -->
-            <div class="admin-section">
-                <h2 class="section-title">
-                    <i class="fas fa-newspaper"></i> News Management
-                </h2>
-                
-                <form id="newsForm">
-                    <div class="form-group">
-                        <label for="newsTitle">Title:</label>
-                        <input type="text" id="newsTitle" placeholder="Enter news title" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="newsContent">Content:</label>
-                        <textarea id="newsContent" placeholder="Enter news content" required></textarea>
-                    </div>
-                    <div class="form-group">
-                        <label for="newsImageUrl">Image URL (optional):</label>
-                        <input type="url" id="newsImageUrl" placeholder="https://example.com/image.jpg" inputmode="url">
-                        <div class="hint">Optional. If provided, the image appears in the news card in 16:9 aspect ratio.</div>
-                    </div>
-                    <!-- Added redirect link field -->
-                    <div class="form-group">
-                        <label for="newsRedirectLink">Redirect Link (optional):</label>
-                        <input type="url" id="newsRedirectLink" placeholder="https://example.com/full-article" inputmode="url">
-                        <div class="hint">Optional. When clicked, the news card will redirect to this URL.</div>
-                    </div>
+            <hr style="margin: 30px 0;">
 
-                    <button type="submit" class="btn">
-                        <i class="fas fa-plus"></i> Add News
-                    </button>
-                    <button type="button" class="btn" onclick="clearNewsForm()">
-                        <i class="fas fa-times"></i> Clear
-                    </button>
-                </form>
-
-                <div class="item-list" id="newsList">
-                    <!-- News items will be loaded here -->
-                </div>
+            <h3>Existing Workshops</h3>
+            <div id="workshopList">
+                <p style="text-align: center; color: #999;">Loading workshops...</p>
             </div>
         </div>
     </div>
 
-    <!-- Firebase Configuration -->
+    <script>
+        // Global functions defined first
+        window.showTab = function(tabName, e) {
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.getElementById(tabName).classList.add('active');
+            e.target.classList.add('active');
+        };
+    </script>
+
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getDatabase, ref, push, onValue, remove, update } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
+        import { getDatabase, ref, set, push, remove, onValue, update } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-database.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyDF2wmnHZWwLsJ3H20FMdnyNSVE7UNPGUE",
@@ -284,371 +356,264 @@
             measurementId: "G-HJD1DPLCXR"
         };
 
-        // Initialize Firebase
         const app = initializeApp(firebaseConfig);
-        const database = getDatabase(app);
+        const db = getDatabase(app);
 
-        // Make Firebase available globally
-        window.firebase = {
-            database,
-            ref,
-            push,
-            onValue,
-            remove,
-            update
+        // User Management
+        function loadUsers() {
+            const usersRef = ref(db, 'users');
+            onValue(usersRef, (snapshot) => {
+                const userList = document.getElementById('userList');
+                userList.innerHTML = '';
+                
+                if (snapshot.exists()) {
+                    const users = snapshot.val();
+                    Object.keys(users).forEach(userId => {
+                        const user = users[userId];
+                        const userDiv = document.createElement('div');
+                        userDiv.className = 'list-item';
+                        userDiv.innerHTML = `
+                            <h3>${user.name || 'N/A'}</h3>
+                            <p><strong>Email:</strong> ${user.email || 'N/A'}</p>
+                            <p><strong>Role:</strong> ${user.role || 'N/A'}</p>
+                            <p><strong>Batch:</strong> ${user.batch || 'N/A'}</p>
+                            <p><strong>SMC ID:</strong> ${user.smcId || 'N/A'}</p>
+                            <div class="actions">
+                                <button class="edit-btn" onclick="editUser('${userId}', ${JSON.stringify(user).replace(/"/g, '&quot;')})">Edit</button>
+                                <button class="delete-btn" onclick="deleteUser('${userId}')">Delete</button>
+                            </div>
+                        `;
+                        userList.appendChild(userDiv);
+                    });
+                } else {
+                    userList.innerHTML = '<p style="text-align: center; color: #999;">No users found</p>';
+                }
+            });
+        }
+
+        window.editUser = function(userId, userData) {
+            document.getElementById('editUserForm').style.display = 'block';
+            document.getElementById('editUserId').value = userId;
+            document.getElementById('editUserName').value = userData.name || '';
+            document.getElementById('editUserEmail').value = userData.email || '';
+            document.getElementById('editUserRole').value = userData.role || '';
+            document.getElementById('editUserBatch').value = userData.batch || '';
+            document.getElementById('editUserSmcId').value = userData.smcId || '';
+            document.getElementById('editUserForm').scrollIntoView({ behavior: 'smooth' });
         };
 
-        // Load content on page load
-        document.addEventListener('DOMContentLoaded', function() {
-            loadHeroImages();
-            loadStats();
-            loadFAQs();
-            loadNews();
-        });
-    </script>
+        window.cancelEditUser = function() {
+            document.getElementById('editUserForm').style.display = 'none';
+        };
 
-    <script>
-        let editingFaqId = null;
-        let editingNewsId = null;
-        let editingHeroId = null;
-
-        // Authentication placeholders (not used in current setup, kept for future use)
-        function showAuthStatus(message, type) {
-            let authStatus = document.getElementById('authStatus');
-            if (!authStatus) {
-              authStatus = document.createElement('div');
-              authStatus.id = 'authStatus';
-              authStatus.className = 'auth-status hidden';
-              document.body.prepend(authStatus);
-            }
-            authStatus.textContent = message;
-            authStatus.className = `auth-status ${type === 'error' ? 'error' : ''}`;
-            authStatus.classList.remove('hidden');
-            setTimeout(() => { authStatus.classList.add('hidden'); }, 3000);
-        }
-
-        document.getElementById('heroForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            const imageUrl = document.getElementById('heroImageUrl').value.trim();
-            if (!imageUrl) return;
-
-            const heroData = {
-                imageUrl,
-                timestamp: Date.now(),
-                date: new Date().toLocaleDateString()
+        window.updateUser = function() {
+            const userId = document.getElementById('editUserId').value;
+            const userData = {
+                name: document.getElementById('editUserName').value,
+                email: document.getElementById('editUserEmail').value,
+                role: document.getElementById('editUserRole').value,
+                batch: document.getElementById('editUserBatch').value,
+                smcId: document.getElementById('editUserSmcId').value
             };
 
-            if (editingHeroId) {
-                window.firebase.update(window.firebase.ref(window.firebase.database, 'heroImages/' + editingHeroId), heroData);
-                editingHeroId = null;
-                document.querySelector('#heroForm button[type="submit"]').innerHTML = '<i class="fas fa-plus"></i> Add Hero Image';
-            } else {
-                window.firebase.push(window.firebase.ref(window.firebase.database, 'heroImages'), heroData);
-            }
-            clearHeroForm();
-        });
+            update(ref(db, `users/${userId}`), userData)
+                .then(() => {
+                    showMessage('user-success', 'User updated successfully!');
+                    cancelEditUser();
+                })
+                .catch((error) => {
+                    showMessage('user-error', 'Error updating user: ' + error.message);
+                });
+        };
 
-        function clearHeroForm() {
-            document.getElementById('heroImageUrl').value = '';
-            editingHeroId = null;
-            document.querySelector('#heroForm button[type="submit"]').innerHTML = '<i class="fas fa-plus"></i> Add Hero Image';
-        }
-
-        function loadHeroImages() {
-            const heroRef = window.firebase.ref(window.firebase.database, 'heroImages');
-            window.firebase.onValue(heroRef, (snapshot) => {
-                const heroList = document.getElementById('heroList');
-                heroList.innerHTML = '';
-                
-                const heroes = snapshot.val();
-                if (heroes) {
-                    Object.keys(heroes).forEach(key => {
-                        const hero = heroes[key];
-                        const heroCard = createHeroCard(key, hero);
-                        heroList.appendChild(heroCard);
+        window.deleteUser = function(userId) {
+            if (confirm('Are you sure you want to delete this user?')) {
+                remove(ref(db, `users/${userId}`))
+                    .then(() => {
+                        showMessage('user-success', 'User deleted successfully!');
+                    })
+                    .catch((error) => {
+                        showMessage('user-error', 'Error deleting user: ' + error.message);
                     });
-                }
-            });
-        }
-
-        function createHeroCard(id, hero) {
-            const div = document.createElement('div');
-            div.className = 'item-card';
-            div.innerHTML = `
-                <div class="hero-thumb" aria-label="Hero image preview">
-                  <div>
-                    <img src="${hero.imageUrl}" alt="Hero image" loading="lazy" referrerpolicy="no-referrer" />
-                  </div>
-                </div>
-                <div>
-                  <div class="item-title">Hero Image</div>
-                  <div class="item-content">${hero.imageUrl}</div>
-                  <div class="date-info">Added: ${hero.date || 'N/A'}</div>
-                  <div class="item-actions">
-                      <button class="btn btn-small" onclick="editHero('${id}', '${escapeQuotes(hero.imageUrl)}')">
-                          <i class="fas fa-edit"></i> Edit
-                      </button>
-                      <button class="btn btn-danger btn-small" onclick="deleteHero('${id}')">
-                          <i class="fas fa-trash"></i> Delete
-                      </button>
-                  </div>
-                </div>
-            `;
-            return div;
-        }
-
-        function editHero(id, imageUrl) {
-            document.getElementById('heroImageUrl').value = unescapeQuotes(imageUrl);
-            editingHeroId = id;
-            document.querySelector('#heroForm button[type="submit"]').innerHTML = '<i class="fas fa-save"></i> Update Hero Image';
-        }
-
-        function deleteHero(id) {
-            if (confirm('Are you sure you want to delete this hero image?')) {
-                window.firebase.remove(window.firebase.ref(window.firebase.database, 'heroImages/' + id));
             }
-        }
+        };
 
-        document.getElementById('statsForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            const statsData = {
-                directors: parseInt(document.getElementById('directorsCount').value) || 25,
-                heads: parseInt(document.getElementById('headsCount').value) || 150,
-                subheads: parseInt(document.getElementById('subheadsCount').value) || 300,
-                members: parseInt(document.getElementById('membersCount').value) || 1200,
-                timestamp: Date.now()
-            };
-
-            window.firebase.update(window.firebase.ref(window.firebase.database, 'statistics'), statsData);
-            showAuthStatus('Statistics updated successfully!', 'success');
-        });
-
-        function loadStats() {
-            const statsRef = window.firebase.ref(window.firebase.database, 'statistics');
-            window.firebase.onValue(statsRef, (snapshot) => {
-                const stats = snapshot.val();
-                if (stats) {
-                    document.getElementById('directorsCount').value = stats.directors || 25;
-                    document.getElementById('headsCount').value = stats.heads || 150;
-                    document.getElementById('subheadsCount').value = stats.subheads || 300;
-                    document.getElementById('membersCount').value = stats.members || 1200;
-                }
-            });
-        }
-
-        // FAQ Management
-        document.getElementById('faqForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            const question = document.getElementById('faqQuestion').value.trim();
-            const answer = document.getElementById('faqAnswer').value.trim();
-            if (!question || !answer) return;
-
-            const faqData = {
-                question,
-                answer,
-                timestamp: Date.now(),
-                date: new Date().toLocaleDateString()
-            };
-
-            if (editingFaqId) {
-                window.firebase.update(window.firebase.ref(window.firebase.database, 'faqs/' + editingFaqId), faqData);
-                editingFaqId = null;
-                document.querySelector('#faqForm button[type="submit"]').innerHTML = '<i class="fas fa-plus"></i> Add FAQ';
+        // News Management
+        window.previewNewsImage = function() {
+            const url = document.getElementById('newsImage').value;
+            const preview = document.getElementById('newsImagePreview');
+            if (url) {
+                preview.src = url;
+                preview.style.display = 'block';
             } else {
-                window.firebase.push(window.firebase.ref(window.firebase.database, 'faqs'), faqData);
+                preview.style.display = 'none';
             }
-            clearFaqForm();
-        });
+        };
 
-        function clearFaqForm() {
-            document.getElementById('faqQuestion').value = '';
-            document.getElementById('faqAnswer').value = '';
-            editingFaqId = null;
-            document.querySelector('#faqForm button[type="submit"]').innerHTML = '<i class="fas fa-plus"></i> Add FAQ';
-        }
+        window.addNews = function() {
+            const title = document.getElementById('newsTitle').value;
+            const date = document.getElementById('newsDate').value;
+            const description = document.getElementById('newsDescription').value;
+            const image = document.getElementById('newsImage').value;
 
-        function loadFAQs() {
-            const faqsRef = window.firebase.ref(window.firebase.database, 'faqs');
-            window.firebase.onValue(faqsRef, (snapshot) => {
-                const faqList = document.getElementById('faqList');
-                faqList.innerHTML = '';
-                
-                const faqs = snapshot.val();
-                if (faqs) {
-                    Object.keys(faqs).forEach(key => {
-                        const faq = faqs[key];
-                        const faqCard = createFaqCard(key, faq);
-                        faqList.appendChild(faqCard);
-                    });
-                }
-            });
-        }
-
-        function createFaqCard(id, faq) {
-            const div = document.createElement('div');
-            div.className = 'item-card';
-            // Empty thumb cell to align grid (no image for FAQs)
-            div.innerHTML = `
-                <div></div>
-                <div>
-                  <div class="item-title">${faq.question}</div>
-                  <div class="item-content">${faq.answer}</div>
-                  <div class="date-info">Added: ${faq.date || 'N/A'}</div>
-                  <div class="item-actions">
-                      <button class="btn btn-small" onclick="editFaq('${id}', '${escapeQuotes(faq.question)}', '${escapeQuotes(faq.answer)}')">
-                          <i class="fas fa-edit"></i> Edit
-                      </button>
-                      <button class="btn btn-danger btn-small" onclick="deleteFaq('${id}')">
-                          <i class="fas fa-trash"></i> Delete
-                      </button>
-                  </div>
-                </div>
-            `;
-            return div;
-        }
-
-        function editFaq(id, question, answer) {
-            document.getElementById('faqQuestion').value = unescapeQuotes(question);
-            document.getElementById('faqAnswer').value = unescapeQuotes(answer);
-            editingFaqId = id;
-            document.querySelector('#faqForm button[type="submit"]').innerHTML = '<i class="fas fa-save"></i> Update FAQ';
-        }
-
-        function deleteFaq(id) {
-            if (confirm('Are you sure you want to delete this FAQ?')) {
-                window.firebase.remove(window.firebase.ref(window.firebase.database, 'faqs/' + id));
+            if (!title || !date || !description) {
+                showMessage('news-error', 'Please fill in all required fields');
+                return;
             }
-        }
-
-        document.getElementById('newsForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            const title = document.getElementById('newsTitle').value.trim();
-            const content = document.getElementById('newsContent').value.trim();
-            const imageUrl = document.getElementById('newsImageUrl').value.trim();
-            const redirectLink = document.getElementById('newsRedirectLink').value.trim();
-            
-            if (!title || !content) return;
 
             const newsData = {
-                title,
-                content,
-                timestamp: Date.now(),
-                date: new Date().toLocaleDateString()
+                name: title,
+                date: date,
+                description: description,
+                image: image || '/news-collage.png'
             };
-            if (imageUrl) newsData.imageUrl = imageUrl;
-            if (redirectLink) newsData.redirectLink = redirectLink;
 
-            if (editingNewsId) {
-                window.firebase.update(window.firebase.ref(window.firebase.database, 'news/' + editingNewsId), newsData);
-                editingNewsId = null;
-                document.querySelector('#newsForm button[type="submit"]').innerHTML = '<i class="fas fa-plus"></i> Add News';
-            } else {
-                window.firebase.push(window.firebase.ref(window.firebase.database, 'news'), newsData);
-            }
-            
-            clearNewsForm();
-        });
-
-        function clearNewsForm() {
-            document.getElementById('newsTitle').value = '';
-            document.getElementById('newsContent').value = '';
-            document.getElementById('newsImageUrl').value = '';
-            document.getElementById('newsRedirectLink').value = '';
-            editingNewsId = null;
-            document.querySelector('#newsForm button[type="submit"]').innerHTML = '<i class="fas fa-plus"></i> Add News';
-        }
+            push(ref(db, 'news'), newsData)
+                .then(() => {
+                    showMessage('news-success', 'News article added successfully!');
+                    document.getElementById('newsTitle').value = '';
+                    document.getElementById('newsDate').value = '';
+                    document.getElementById('newsDescription').value = '';
+                    document.getElementById('newsImage').value = '';
+                    document.getElementById('newsImagePreview').style.display = 'none';
+                })
+                .catch((error) => {
+                    showMessage('news-error', 'Error adding news: ' + error.message);
+                });
+        };
 
         function loadNews() {
-            const newsRef = window.firebase.ref(window.firebase.database, 'news');
-            window.firebase.onValue(newsRef, (snapshot) => {
+            const newsRef = ref(db, 'news');
+            onValue(newsRef, (snapshot) => {
                 const newsList = document.getElementById('newsList');
                 newsList.innerHTML = '';
                 
-                const news = snapshot.val();
-                if (news) {
-                    const sortedNews = Object.keys(news)
-                        .map(key => ({id: key, ...news[key]}))
-                        .sort((a, b) => (b.timestamp ?? 0) - (a.timestamp ?? 0));
-                    
-                    sortedNews.forEach(item => {
-                        const newsCard = createNewsCard(item);
-                        newsList.appendChild(newsCard);
+                if (snapshot.exists()) {
+                    const news = snapshot.val();
+                    Object.keys(news).forEach(newsId => {
+                        const item = news[newsId];
+                        const newsDiv = document.createElement('div');
+                        newsDiv.className = 'list-item';
+                        newsDiv.innerHTML = `
+                            <h3>${item.name}</h3>
+                            <p><strong>Date:</strong> ${item.date}</p>
+                            <p>${item.description}</p>
+                            ${item.image ? `<img src="${item.image}" style="max-width: 200px; margin-top: 10px; border-radius: 8px;">` : ''}
+                            <div class="actions">
+                                <button class="delete-btn" onclick="deleteNews('${newsId}')">Delete</button>
+                            </div>
+                        `;
+                        newsList.appendChild(newsDiv);
                     });
+                } else {
+                    newsList.innerHTML = '<p style="text-align: center; color: #999;">No news articles found</p>';
                 }
             });
         }
 
-        function createNewsCard(item) {
-            const { id, title = '', content = '', imageUrl = '', redirectLink = '', date } = item;
-            const div = document.createElement('div');
-            div.className = 'item-card';
-            div.dataset.id = id;
-            div.dataset.title = title;
-            div.dataset.content = content;
-            div.dataset.imageUrl = imageUrl || '';
-            div.dataset.redirectLink = redirectLink || '';
-
-            const preview = imageUrl
-              ? `
-                <div class="thumb" aria-label="News image preview">
-                  <div>
-                    <img src="${imageUrl}" alt="News image" loading="lazy" referrerpolicy="no-referrer" />
-                  </div>
-                </div>
-              `
-              : '<div></div>';
-
-            const redirectInfo = redirectLink ? `<div class="hint">Redirects to: ${redirectLink}</div>` : '';
-
-            div.innerHTML = `
-                ${preview}
-                <div>
-                  <div class="item-title">${title}</div>
-                  <div class="item-content">${content}</div>
-                  ${redirectInfo}
-                  <div class="date-info">Published: ${date || 'N/A'}</div>
-                  <div class="item-actions">
-                      <button class="btn btn-small" onclick="editNewsFromCard(this)">
-                          <i class="fas fa-edit"></i> Edit
-                      </button>
-                      <button class="btn btn-danger btn-small" onclick="deleteNews('${id}')">
-                          <i class="fas fa-trash"></i> Delete
-                      </button>
-                  </div>
-                </div>
-            `;
-            return div;
-        }
-
-        function editNewsFromCard(button) {
-            const card = button.closest('.item-card');
-            if (!card) return;
-            document.getElementById('newsTitle').value = card.dataset.title || '';
-            document.getElementById('newsContent').value = card.dataset.content || '';
-            document.getElementById('newsImageUrl').value = card.dataset.imageUrl || '';
-            document.getElementById('newsRedirectLink').value = card.dataset.redirectLink || '';
-            editingNewsId = card.dataset.id;
-            document.querySelector('#newsForm button[type="submit"]').innerHTML = '<i class="fas fa-save"></i> Update News';
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-
-        function deleteNews(id) {
-            if (confirm('Are you sure you want to delete this news item?')) {
-                window.firebase.remove(window.firebase.ref(window.firebase.database, 'news/' + id));
+        window.deleteNews = function(newsId) {
+            if (confirm('Are you sure you want to delete this news article?')) {
+                remove(ref(db, `news/${newsId}`))
+                    .then(() => {
+                        showMessage('news-success', 'News article deleted successfully!');
+                    })
+                    .catch((error) => {
+                        showMessage('news-error', 'Error deleting news: ' + error.message);
+                    });
             }
+        };
+
+        // Workshop Management
+        window.addWorkshop = function() {
+            const title = document.getElementById('workshopTitle').value;
+            const ledBy = document.getElementById('workshopLedBy').value;
+            const date = document.getElementById('workshopDate').value;
+            const description = document.getElementById('workshopDescription').value;
+            const link = document.getElementById('workshopLink').value;
+
+            if (!title || !ledBy || !date || !description) {
+                showMessage('workshop-error', 'Please fill in all required fields');
+                return;
+            }
+
+            const workshopData = {
+                name: title,
+                ledBy: ledBy,
+                date: date,
+                description: description,
+                applyLink: link || '#'
+            };
+
+            push(ref(db, 'workshops'), workshopData)
+                .then(() => {
+                    showMessage('workshop-success', 'Workshop added successfully!');
+    document.getElementById('workshopTitle').value = '';
+                    document.getElementById('workshopLedBy').value = '';
+                    document.getElementById('workshopDate').value = '';
+                    document.getElementById('workshopDescription').value = '';
+                    document.getElementById('workshopLink').value = '';
+                })
+                .catch((error) => {
+                    showMessage('workshop-error', 'Error adding workshop: ' + error.message);
+                });
+        };
+
+        function loadWorkshops() {
+            const workshopsRef = ref(db, 'workshops');
+            onValue(workshopsRef, (snapshot) => {
+                const workshopList = document.getElementById('workshopList');
+                workshopList.innerHTML = '';
+                
+                if (snapshot.exists()) {
+                    const workshops = snapshot.val();
+                    Object.keys(workshops).forEach(workshopId => {
+                        const workshop = workshops[workshopId];
+                        const workshopDiv = document.createElement('div');
+                        workshopDiv.className = 'list-item';
+                        workshopDiv.innerHTML = `
+                            <h3>${workshop.name}</h3>
+                            <p><strong>Led by:</strong> ${workshop.ledBy}</p>
+                            <p><strong>Date:</strong> ${workshop.date || 'N/A'}</p>
+                            <p>${workshop.description}</p>
+                            ${workshop.applyLink ? `<p><strong>Apply Link:</strong> <a href="${workshop.applyLink}" target="_blank">${workshop.applyLink}</a></p>` : ''}
+                            <div class="actions">
+                                <button class="delete-btn" onclick="deleteWorkshop('${workshopId}')">Delete</button>
+                            </div>
+                        `;
+                        workshopList.appendChild(workshopDiv);
+                    });
+                } else {
+                    workshopList.innerHTML = '<p style="text-align: center; color: #999;">No workshops found</p>';
+                }
+            });
         }
 
-        // Small helpers to safely embed strings where needed
-        function escapeQuotes(str='') {
-          return String(str).replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+        window.deleteWorkshop = function(workshopId) {
+            if (confirm('Are you sure you want to delete this workshop?')) {
+                remove(ref(db, `workshops/${workshopId}`))
+                    .then(() => {
+                        showMessage('workshop-success', 'Workshop deleted successfully!');
+                    })
+                    .catch((error) => {
+                        showMessage('workshop-error', 'Error deleting workshop: ' + error.message);
+                    });
+            }
+        };
+
+        // Utility function to show messages
+        function showMessage(elementId, message) {
+            const element = document.getElementById(elementId);
+            element.textContent = message;
+            element.style.display = 'block';
+            setTimeout(() => {
+                element.style.display = 'none';
+            }, 5000);
         }
-        function unescapeQuotes(str='') {
-          return String(str).replace(/&quot;/g, '"').replace(/&#39;/g, "'");
-        }
+
+        // Initialize
+        loadUsers();
+        loadNews();
+        loadWorkshops();
     </script>
 </body>
 </html>
